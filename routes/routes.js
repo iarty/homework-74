@@ -2,7 +2,7 @@ const { Router } = require("express");
 const router = Router();
 const fs = require("fs");
 
-const path = "./messages";
+const path = "./messages/";
 
 router.get("/", (req, res) => {
   res.redirect("/messages");
@@ -23,7 +23,7 @@ router.get("/messages", (req, res) => {
   fs.readdir(path, async (err, files) => {
     const resolve = files
       .slice(-5)
-      .map(fileName => JSON.parse(fs.readFileSync(`${path}/${fileName}`)));
+      .map(fileName => JSON.parse(fs.readFileSync(path + fileName)));
     res.send(resolve);
   });
 });
