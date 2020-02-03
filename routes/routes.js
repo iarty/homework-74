@@ -8,24 +8,10 @@ router.get("/", (req, res) => {
   res.redirect("/messages");
 });
 
-const sendData = arr => {
-  return new Promise(resolve => {
-    const newArr = [];
-    arr.slice(-5).forEach(fileName => {
-      fs.readFile(`${path}/${fileName}`, (err, data) => {
-        newArr.push(JSON.parse(data));
-        if (newArr.length === 5) {
-          return resolve(newArr);
-        }
-      });
-    });
-  });
-};
-
 router.post("/messages", (req, res) => {
   const date = new Date().toLocaleString();
   const fileName = `./messages/${date}.txt`;
-  fs.writeFile(fileName, JSON.stringify(req.body), err => {
+  fs.writeFile(fileName, JSON.stringify({ ...req.body, date }), err => {
     if (err) {
       res.send(err);
     }
@@ -34,12 +20,11 @@ router.post("/messages", (req, res) => {
 });
 
 router.get("/messages", (req, res) => {
-  const arr = [];
   fs.readdir(path, async (err, files) => {
-    files.forEach(file => {
-      arr.push(file);
-    });
-    res.send(await sendData(arr));
+    const resolve = files
+      .slice(-5)
+      .map(fileName => JSON.parse(fs.readFileSync(`${path}/${fileName}`)));
+    res.send(resolve);
   });
 });
 
